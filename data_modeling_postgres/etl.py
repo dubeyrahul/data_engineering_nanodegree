@@ -21,6 +21,11 @@ def process_song_file(cur, filepath):
     cur.execute(artist_table_insert, artist_data)
 
 def get_time_data_from_df(df, timestamp_col):
+    """
+    Takes a Pandas DF and a column-name containing timestamp data, and derives date-based attributes from this column
+    :param df: Pandas DataFrame containing timestamp data
+    :param timestamp_col: str denotes column name which contains timestamp data
+    """
     datetime_col= 'start_time'
     df[datetime_col] =  pd.to_datetime(df[timestamp_col], unit='ms')
     time_units = ['hour', 'day', 'week', 'month', 'year', 'weekday']
