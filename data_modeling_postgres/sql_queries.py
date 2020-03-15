@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS songs
     title varchar,
     artist_id varchar,
     year int,
-    duration real,
+    duration float,
     PRIMARY KEY (song_id)
 )
 """)
