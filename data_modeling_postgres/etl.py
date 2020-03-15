@@ -6,6 +6,15 @@ from sql_queries import *
 
 
 def process_song_file(cur, filepath):
+    """
+    Function to process a single file path and insert data from it to songs and artists table
+
+    :param postgres-cursor cur: Postgres cursor to execute queries with
+    :param str filepath: filepath containing song data
+    :return: Nothing (it executes the query and inserts data)
+    :rtype: None
+    """
+
     # open song file
     df = pd.DataFrame([pd.read_json(filepath,  typ='series', convert_dates=False)])
 
@@ -21,6 +30,14 @@ def process_song_file(cur, filepath):
     cur.execute(artist_table_insert, artist_data)
 
 def get_time_data_from_df(df, timestamp_col):
+    """
+    Takes a Pandas DF and a column-name containing timestamp data, and derives date-based attributes from this column
+
+    :param pandas.DataFrame df: Pandas DataFrame containing timestamp data
+    :param str timestamp_col: str denotes column name which contains timestamp data
+    :return: pandas DF containing parsed timestamp column as datetime, and other datetime based attributes
+    :rtype: pandas.DataFrame
+    """
     datetime_col= 'start_time'
     df[datetime_col] =  pd.to_datetime(df[timestamp_col], unit='ms')
     time_units = ['hour', 'day', 'week', 'month', 'year', 'weekday']
@@ -29,7 +46,26 @@ def get_time_data_from_df(df, timestamp_col):
         time_data_series.append(getattr(df[datetime_col].dt,time_unit).rename(time_unit))
     return pd.concat(time_data_series, axis=1)
 
+def get_songplay_id_for_row(user_id, timestamp):
+    """
+    Generates unique songplay_id based for a user's activity
+    
+    :param str user_id: user-id as int
+    :param str timestamp: timestamp as int
+    :return: songplay_id
+    :rtype: str
+    """
+    return f"u{user_id}_t{timestamp}"
+
 def process_log_file(cur, filepath):
+    """
+    Processes log files and inserts data into time, users, and songplays table
+
+    :param postgres-cursor cur: Postgres cursor to execute queries with
+    :param str filepath: filepath containing log data
+    :return: Nothing (executes insert queries)
+    :rtype: None
+    """
     # open log file
     df = pd.read_json(filepath, lines=True)
 
@@ -68,12 +104,22 @@ def process_log_file(cur, filepath):
 
         # insert songplay record
         # construct a songplay_id from user_id and timestamp as this combination will be unique (assuming user can play from only one platform at a time
-        songplay_id = 'u'+str(row.userId)+'_t'+str(row.ts)
+        songplay_id = get_songplay_id_for_row(row.userId, row.ts)
         songplay_data = (songplay_id, row.start_time, row.userId, row.level, songid, artistid, row.sessionId, row.location, row.userAgent) 
         cur.execute(songplay_table_insert, songplay_data)
 
 
 def process_data(cur, conn, filepath, func):
+    """
+    Generic function to process data and perform ETL
+
+    :param postgres cursor cur: Postgres cur for a given database
+    :param postgres connection conn: Postgres connection for a given database
+    :param str filepath: base filepath containing log files
+    :param function func: a callable that performs etl
+    :return: Nothing (performs etl)
+    :rtype: None
+    """
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):

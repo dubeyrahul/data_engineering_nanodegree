@@ -1,3 +1,10 @@
+"""
+This file contains all the SQL queries for:
+    1. Dropping the tables if they exist
+    2. Create tables if they do not exist
+    3. Insert data into tables and handling conflicts based on which table to insert to
+    4. Select queries to perform etl for songplays table
+"""
 # DROP TABLES
 
 songplay_table_drop = "DROP TABLE IF EXISTS songplays"
