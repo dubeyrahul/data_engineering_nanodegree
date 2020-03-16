@@ -46,17 +46,6 @@ def get_time_data_from_df(df, timestamp_col):
         time_data_series.append(getattr(df[datetime_col].dt,time_unit).rename(time_unit))
     return pd.concat(time_data_series, axis=1)
 
-def get_songplay_id_for_row(user_id, timestamp):
-    """
-    Generates unique songplay_id based for a user's activity
-    
-    :param str user_id: user-id as int
-    :param str timestamp: timestamp as int
-    :return: songplay_id
-    :rtype: str
-    """
-    return f"u{user_id}_t{timestamp}"
-
 def process_log_file(cur, filepath):
     """
     Processes log files and inserts data into time, users, and songplays table
@@ -103,9 +92,7 @@ def process_log_file(cur, filepath):
             songid, artistid = None, None
 
         # insert songplay record
-        # construct a songplay_id from user_id and timestamp as this combination will be unique (assuming user can play from only one platform at a time
-        songplay_id = get_songplay_id_for_row(row.userId, row.ts)
-        songplay_data = (songplay_id, row.start_time, row.userId, row.level, songid, artistid, row.sessionId, row.location, row.userAgent) 
+        songplay_data = (index, row.start_time, row.userId, row.level, songid, artistid, row.sessionId, row.location, row.userAgent) 
         cur.execute(songplay_table_insert, songplay_data)
 
 
