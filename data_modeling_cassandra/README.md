@@ -7,5 +7,7 @@ Use `sudo service cassandra start` to start and `sudo service cassandra stop` to
 Check the port number on which Cassandra is running (verify that it is 9042) (hint: check this file: `/etc/cassandra/cassandra.yaml`
 
 ### Step 3: Install Python driver
+```sh
 $ pip3 install cassandra-driver
+```
 Or refer instructions at: https://docs.datastax.com/en/developer/python-driver/3.22/installation/
