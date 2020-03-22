@@ -1,5 +1,8 @@
 backcall==0.1.0
+cassandra-driver==3.22.0
+click==7.1.1
 decorator==4.4.2
+geomet==0.1.2
 ipykernel==5.1.4
 ipython==7.13.0
 ipython-genutils==0.2.0
