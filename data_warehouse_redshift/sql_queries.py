@@ -88,7 +88,7 @@ diststyle all
 
 # Create song_dim as our song dimension table containing song information
 # we select song_id as our sortkey and distkey because it might be too big
-# to fit in one slice
+# to fit in on a single slice
 song_table_create = ("""
 CREATE TABLE IF NOT EXISTS song_dim (
     song_id VARCHAR NOT NULL sortkey distkey,
