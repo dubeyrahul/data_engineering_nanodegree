@@ -5,6 +5,10 @@ The process looks like the following:
 2. We design our DW schema with appropriate fact and dimension tables, and come up with good sortkey and distkey
 3. Next, we transform data from our staging table and load it into our star-schema tables to support analytical queries
 
+The DW schema looks like the following:
+
+![Sparkify DW](images/Sparkify_DW_background_shadow.png)
+
 ## Setup instructions:
 ### Step 1: Create AWS account:
 We can do so by following this link: https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/
