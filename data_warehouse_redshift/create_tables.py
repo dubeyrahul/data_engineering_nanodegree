@@ -15,10 +15,12 @@ def drop_tables(cur, conn):
 def create_tables(cur, conn):
     print("Creating tables")
     for query in create_table_queries:
-        print(query)
-        print(separator)
+        print("Running:\n"+query)
         cur.execute(query)
         conn.commit()
+        print("done")
+        print(separator)
+
 
 
 def main():
