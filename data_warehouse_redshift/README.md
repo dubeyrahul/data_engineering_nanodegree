@@ -61,4 +61,5 @@ SONG_DATA='s3://udacity-dend/song_data'
 1. Run create_tables.py from data_warehouse_redshift directory (this will drop and create tables needed for this project)
 2. Run etl.py which will perform steps 1-3 as described in project-description
 
-### Step 6: Perform analytical queries
+### Step 6: Perform data-checks and analytical queries
+The demo data-checks and analytical queries can be found in [`Redshift_DW_Demo.ipynb`](https://github.com/dubeyrahul/data_eng_nanodegree/blob/master/data_warehouse_redshift/Redshift_DW_Demo.ipynb) 
