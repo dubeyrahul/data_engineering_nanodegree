@@ -18,21 +18,21 @@ time_table_drop = "DROP TABLE IF EXISTS time_dim"
 staging_events_table_create= ("""
 CREATE TABLE IF NOT EXISTS staging_events (
     artist VARCHAR,
-    auth VARCHAR NOT NULL,
+    auth VARCHAR,
     firstName VARCHAR,
     gender CHAR(1),
-    itemInSession INT NOT NULL,
+    itemInSession INT,
     lastName VARCHAR,
     length FLOAT,
-    level VARCHAR NOT NULL,
+    level VARCHAR,
     location VARCHAR,
-    method CHAR(3) NOT NULL,
-    page VARCHAR NOT NULL,
+    method CHAR(3),
+    page VARCHAR,
     registration FLOAT,
-    sessionId INT NOT NULL,
+    sessionId INT,
     song VARCHAR,
-    status SMALLINT NOT NULL,
-    ts BIGINT NOT NULL,
+    status SMALLINT,
+    ts BIGINT,
     userAgent VARCHAR,
     userId VARCHAR
 )
@@ -41,16 +41,16 @@ CREATE TABLE IF NOT EXISTS staging_events (
 # Create staging_songs table to store song data
 staging_songs_table_create = ("""
 CREATE TABLE IF NOT EXISTS staging_songs (
-    artist_id VARCHAR NOT NULL,
+    artist_id VARCHAR,
     artist_latitude FLOAT,
     artist_location VARCHAR,
     artist_longitude FLOAT,
     artist_name VARCHAR,
-    duration FLOAT NOT NULL,
-    num_songs INT NOT NULL,
-    song_id VARCHAR NOT NULL,
-    title VARCHAR NOT NULL,
-    year SMALLINT NOT NULL
+    duration FLOAT,
+    num_songs INT,
+    song_id VARCHAR,
+    title VARCHAR,
+    year SMALLINT
 )
 """)
 
@@ -69,7 +69,8 @@ CREATE TABLE IF NOT EXISTS songplay_fact (
     artist_id VARCHAR NOT NULL,
     session_id INT NOT NULL,
     location VARCHAR NOT NULL,
-    user_agent VARCHAR NOT NULL
+    user_agent VARCHAR NOT NULL,
+    primary key (songplay_id)
 )
 """)
 
@@ -81,7 +82,8 @@ CREATE TABLE IF NOT EXISTS user_dim (
     first_name VARCHAR NOT NULL,
     last_name VARCHAR NOT NULL,
     gender VARCHAR NOT NULL,
-    level VARCHAR NOT NULL
+    level VARCHAR NOT NULL,
+    primary key (user_id)
 )
 diststyle all
 """)
@@ -95,7 +97,8 @@ CREATE TABLE IF NOT EXISTS song_dim (
     title VARCHAR NOT NULL,
     artist_id VARCHAR NOT NULL,
     year SMALLINT NOT NULL,
-    duration FLOAT NOT NULL
+    duration FLOAT NOT NULL,
+    primary key (song_id)
 )
 """)
 
@@ -107,7 +110,8 @@ CREATE TABLE IF NOT EXISTS artist_dim (
     name VARCHAR NOT NULL,
     location VARCHAR,
     latitude REAL,
-    longitude REAL
+    longitude REAL,
+    primary key (artist_id)
 )
 diststyle all
 """)
@@ -122,7 +126,8 @@ CREATE TABLE IF NOT EXISTS time_dim (
     week SMALLINT NOT NULL,
     month SMALLINT NOT NULL,
     year SMALLINT NOT NULL,
-    weekday SMALLINT NOT NULL
+    weekday SMALLINT NOT NULL,
+    primary key (start_time)
 )
 diststyle all
 """)
@@ -222,7 +227,7 @@ time_table_insert = ("""
 INSERT INTO time_dim
 (
     SELECT
-        start_time AS start_time,
+        DISTINCT(start_time) AS start_time,
         EXTRACT(hour FROM start_time) AS hour,
         EXTRACT(day FROM start_time) AS day,
         EXTRACT(week FROM start_time) AS week,
