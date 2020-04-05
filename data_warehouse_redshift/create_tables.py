@@ -2,6 +2,7 @@ import configparser
 import psycopg2
 from sql_queries import create_table_queries, drop_table_queries
 
+separator = "-"*30
 
 def drop_tables(cur, conn):
     """
@@ -11,10 +12,12 @@ def drop_tables(cur, conn):
     :return: None
     :rtype: None
     """
+    print("Dropping tables")
     for query in drop_table_queries:
+        print(query)
+        print(separator)
         cur.execute(query)
         conn.commit()
-
 
 def create_tables(cur, conn):
     """
@@ -24,10 +27,13 @@ def create_tables(cur, conn):
     :return: None
     :rtype: None
     """
+    print("Creating tables")
     for query in create_table_queries:
+        print("Running:\n"+query)
         cur.execute(query)
         conn.commit()
-
+        print("done")
+        print(separator)
 
 def main():
     # Loading the dwh.cfg file to load Redshift cluster config
