@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS staging_songs (
     num_songs INT NOT NULL,
     song_id VARCHAR NOT NULL,
     title VARCHAR NOT NULL,
-    year VARCHAR NOT NULL
+    year SMALLINT NOT NULL
 )
 """)
 
