@@ -7,7 +7,7 @@ The process looks like the following:
 
 The DW schema looks like the following:
 
-![Sparkify DW](images/Sparkify_DW.png)
+![Sparkify DW](images/Sparkify_DW_background_shadow.png)
 
 ## Setup instructions:
 ### Step 1: Create AWS account:
