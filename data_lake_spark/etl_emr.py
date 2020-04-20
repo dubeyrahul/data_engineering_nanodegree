@@ -20,26 +20,17 @@ def get_json_s3_paths(bucket_name, prefix_name):
     s3_objects = []
     for obj in bucket.objects.filter(Prefix=prefix_name):
         s3_objects.append(obj)
-    return [f"s3a://{obj.bucket_name}/{obj.key}" for obj in s3_objects if obj.key[-5:]=='.json']
+    return [f"s3n://{obj.bucket_name}/{obj.key}" for obj in s3_objects if obj.key[-5:]=='.json']
 
 
 def create_spark_session():
     spark = SparkSession \
         .builder \
-        .master("local[*]")\
-        .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:2.7.0") \
-        .config("spark.hadoop.fs.s3a.multiobjectdelete.enable","false") \
-        .config("spark.hadoop.fs.s3a.fast.upload","true") \
         .config("spark.sql.parquet.filterPushdown", "true") \
         .config("spark.sql.parquet.mergeSchema", "false") \
-        .config("spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version", "2") \
-        .config("spark.speculation", "false") \
         .appName("sparkify-etl") \
         .getOrCreate()
-    hadoop_conf = spark.sparkContext._jsc.hadoopConfiguration()
-    hadoop_conf.set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
-    hadoop_conf.set("fs.s3a.access.key", os.environ['AWS_ACCESS_KEY_ID'])
-    hadoop_conf.set("fs.s3a.secret.key", os.environ['AWS_SECRET_ACCESS_KEY'])
+    sc = spark.sparkContext
     sc.setLogLevel("ERROR")
     return spark
 
@@ -48,7 +39,7 @@ def process_song_data(spark, input_bucket, output_bucket):
     # get filepath to song data
     song_input_paths = get_json_s3_paths(bucket_name=input_bucket, prefix_name="song_data")
 #     song_input_path = os.path.join(input_data, "song_data/A/A/A/*.json")
-    output_base_path = f"s3a://{output_bucket}"
+    output_base_path = f"s3n://{output_bucket}"
     song_output_path = os.path.join(output_base_path, "song_dim")
     print("output-path:", song_output_path)
     artist_output_path = os.path.join(output_base_path, "artist_dim")
@@ -97,9 +88,10 @@ def process_log_data(spark, input_bucket, output_bucket, song_data):
     # get filepath to log data file
     log_data_paths = get_json_s3_paths(bucket_name=input_bucket, prefix_name="log_data")
 #     log_data_path = os.path.join(input_data, "log_data/*/*/*.json")
-    output_base_path = f"s3a://{output_bucket}"
+    output_base_path = f"s3n://{output_bucket}"
     user_output_path = os.path.join(output_base_path, "user_dim")
     time_output_path = os.path.join(output_base_path, "time_dim")
+    songplays_output_path = os.path.join(output_base_path, "songplay_fact")
     # read log data file
     print("Reading log data")
     df = spark.read.json(log_data_paths)
@@ -169,10 +161,10 @@ def process_log_data(spark, input_bucket, output_bucket, song_data):
 
     # extract columns from joined song and log datasets to create songplays table
     songplays_table = log_data_part.join(song_data,
-                                   (song_data.title==log_data_part.song) & (song_data.artist_name == log_data.artist)
+                                   (song_data.title==log_data_part.song) & (song_data.artist_name == log_data_part.artist)
                                   )\
                             .select(['songplay_id', 'start_time', 'user_id', 'level',
-                                     'song_id', 'artist_id', 'session_id', 'location', 'user_agent'])
+                                     'song_id', 'artist_id', 'session_id', 'location', 'user_agent', log_data_part.year, log_data_part.month])
     songplays_table.coalesce(32)
     # write songplays table to parquet files partitioned by year and month
     print("Writing songplays_fact")
