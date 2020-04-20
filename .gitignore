@@ -4,3 +4,4 @@ data_eng_env
 lessons
 data_warehouse_redshift/dwh.cfg
 *.DS_Store
+data_lake_spark/dl.cfg
