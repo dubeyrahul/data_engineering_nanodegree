@@ -1,4 +1,5 @@
-Github repository for [Data Engineering Nanodegree](https://www.udacity.com/course/data-engineer-nanodegree--nd027) on Udacity
+Github repository for [Data Engineering Nanodegree](https://www.udacity.com/course/data-engineer-nanodegree--nd027) on Udacity.
+
 Following are my learning goals for this nanodegree:
 1. Data Modeling [DONE]
     1. Learn Data Modeling with Relational DB: Postgres
