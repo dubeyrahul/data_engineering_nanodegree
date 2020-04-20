@@ -3,3 +3,4 @@ data_eng_env
 *.ipynb_checkpoints*
 lessons
 data_warehouse_redshift/dwh.cfg
+*.DS_Store
