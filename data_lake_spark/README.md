@@ -46,7 +46,7 @@ Next steps:
 2. Use bootstrap script to setup the environment and submit step on EMR using add-step
 
 <h1>
-
+</h1>
 
 Notes to self:
 Spark installation guide for Ubuntu:
