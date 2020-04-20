@@ -1,5 +1,14 @@
-To set up psql locally on Ubuntu:
-1. Install postgres and psycopg2-binary
-2. make sure that postgresql.conf points to the port number and hostname present in create_table.py script
-3. you can verify 2 by doing a netstat check (netstat -na | grep postgres)
-4. once you change port/host in the conf file stop and restart the postgres service using: `service postgres stop` and `service postgres start`
+Github repository for [Data Engineering Nanodegree](https://www.udacity.com/course/data-engineer-nanodegree--nd027) on Udacity
+Following are my learning goals for this nanodegree:
+1. Data Modeling [DONE]
+    1. Learn Data Modeling with Relational DB: Postgres
+    2. Learn Data Modeling with NoSQL DB: Apache Cassandra
+2. Cloud Data Warehouse [DONE]
+    1. Learn about cloud infrastructure for DW (AWS), and Infrastructure-as-code
+    2. Implement a star-schema based DW on AWS Redshift
+3. Spark and DataLakes [DONE]
+    1. Learning to use Spark to work with massive datasets
+    2. Implement data-lake on AWS S3 using Spark on AWS EMR
+4. Data pipelines [IN PROGRESS]
+    1. Learn about data-pipeline and data-quality
+    2. Implement production data-pipeline using Apache Airflow and build DW on AWS Redshift
