@@ -15,6 +15,15 @@ os.environ['AWS_SECRET_ACCESS_KEY']=config['AWS']['AWS_SECRET_ACCESS_KEY']
 
 
 def get_json_s3_paths(bucket_name, prefix_name):
+    """
+    Given a bucket name and prefix, get all S3 paths for JSON files
+
+    This is done so that we can reduce the AWS ListAPI calls when performing spark.read()
+    :param str bucket_name: Name of the S3 bucket
+    :param str prefix_name: Name of the prefix to read
+    :return: List of S3 paths containing JSON files
+    :rtype: List[str]
+    """
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(bucket_name)
     s3_objects = []
@@ -24,6 +33,9 @@ def get_json_s3_paths(bucket_name, prefix_name):
 
 
 def create_spark_session():
+    """
+    Creates and returns a Spark Session
+    """
     spark = SparkSession \
         .builder \
         .config("spark.sql.parquet.filterPushdown", "true") \
@@ -36,20 +48,26 @@ def create_spark_session():
 
 
 def process_song_data(spark, input_bucket, output_bucket):
-    # get filepath to song data
+    """
+    Processes song logs from S3 and creates song and artist dimension tables on S3
+
+    :param SparkSession spark: SparkSession used for this ETL
+    :param str input_bucket: S3 bucket name containing song logs
+    :param str output_bucket: S3 bucket to write dimension tables to
+    :return song_data: DataFrame containing song logs read from S3
+    :rtype pyspark.sql.DataFrame
+    """
+    # Get all JSON S3 paths for song_data from input_bucket
     song_input_paths = get_json_s3_paths(bucket_name=input_bucket, prefix_name="song_data")
-#     song_input_path = os.path.join(input_data, "song_data/A/A/A/*.json")
+    # Create output S3 paths for song and artist dimension tables
     output_base_path = f"s3n://{output_bucket}"
     song_output_path = os.path.join(output_base_path, "song_dim")
-    print("output-path:", song_output_path)
     artist_output_path = os.path.join(output_base_path, "artist_dim")
-    # read song data file
     print("Reading song logs")
     song_data = spark.read.json(song_input_paths)
     print(song_data.printSchema())
     song_data.cache()
-
-    # extract columns to create songs table
+    print("Creating song_dim table")
     songs_table = song_data\
             .filter((f.col('song_id').isNotNull()) &
                     (f.col('title').isNotNull()) &
@@ -60,12 +78,11 @@ def process_song_data(spark, input_bucket, output_bucket):
             .dropDuplicates(subset=['song_id'])\
             .select(['song_id', 'title', 'artist_id', 'year', 'duration'])
     songs_table.coalesce(16)
-    # write songs table to parquet files partitioned by year and artist
     print(songs_table.printSchema())
+    print("Writing song_dim table")
     songs_table.coalesce(16).write.partitionBy(['year', 'artist_id']).mode("overwrite").parquet(song_output_path)
-    print("Done writing songs_table")
 
-    # extract columns to create artists table
+    print("Creating artist_dim table")
     artists_table  = song_data\
                 .filter((f.col('artist_id').isNotNull()) &
                         (f.col('artist_name').isNotNull())
@@ -77,31 +94,37 @@ def process_song_data(spark, input_bucket, output_bucket):
                 .withColumnRenamed('artist_latitude', 'latitude')\
                 .withColumnRenamed('artist_longitude', 'longitude')
     artists_table.coalesce(16)
-    # write artists table to parquet files
     print(artists_table.printSchema())
+    print("Writing artist_dim table")
     artists_table.coalesce(16).write.mode("overwrite").parquet(artist_output_path)
-    print("Done writing artists_table")
     return song_data
 
 
 def process_log_data(spark, input_bucket, output_bucket, song_data):
-    # get filepath to log data file
+    """
+    Processes log_data from S3 and song_data DataFrame to create user and time dimension, songplay_fact tables
+
+    :param SparkSession spark: SparkSession used for this ETL
+    :param str input_bucket: S3 bucket name containing event logs
+    :param str output_bucket: S3 bucket name to write user,time dimension and songplay fact table
+    :param pyspark.sql.DataFrame song_data: DataFrame containing song_logs
+    :return Nothing (Writes tables to S3)
+    :rtype None
+    """
+    # Get all log_data paths from S3 to read
     log_data_paths = get_json_s3_paths(bucket_name=input_bucket, prefix_name="log_data")
-#     log_data_path = os.path.join(input_data, "log_data/*/*/*.json")
+    # Create output S3 path for each table
     output_base_path = f"s3n://{output_bucket}"
     user_output_path = os.path.join(output_base_path, "user_dim")
     time_output_path = os.path.join(output_base_path, "time_dim")
     songplays_output_path = os.path.join(output_base_path, "songplay_fact")
-    # read log data file
     print("Reading log data")
     df = spark.read.json(log_data_paths)
 
-    # filter by actions for song plays
     print("Filtering for NextSong")
     filtered_df = df.filter(f.col('page') == 'NextSong')
 
-    # extract columns for users table
-    print("Creating user dim")
+    print("Creating user_dim table")
     users_table = filtered_df\
                 .filter((f.col('userId').isNotNull()) &
                         (f.col('firstName').isNotNull()) &
@@ -120,12 +143,10 @@ def process_log_data(spark, input_bucket, output_bucket, song_data):
                 .withColumnRenamed('lastName', 'last_name')
 
     users_table.coalesce(16)
-    # write users table to parquet files
-    print("Writing user dim")
+    print("Writing user_dim table")
     users_table.coalesce(16).write.mode("overwrite").parquet(user_output_path)
 
-    # create timestamp column from original timestamp column
-    print("Creating time dim")
+    print("Creating time_dim")
     time_table = filtered_df\
                 .select(f.to_timestamp(f.from_unixtime(f.col('ts')/1000)).alias('start_time'))\
                 .filter(f.col('start_time').isNotNull())\
@@ -138,14 +159,11 @@ def process_log_data(spark, input_bucket, output_bucket, song_data):
                 .withColumn('weekday', f.dayofweek('start_time'))
 
     time_table.coalesce(16)
-    # write time table to parquet files partitioned by year and month
     print("Writing time dim")
     time_table.coalesce(16).write.partitionBy(['year', 'month']).mode("overwrite").parquet(time_output_path)
 
-    # read in song data to use for songplays table
-    # passed in song_data instead of reading it again
+    # Avoid reading song_data from S3 again as it's super slow, and use the song_data DF passed to this function
     print("Creating songplays_fact")
-
     log_data_part = filtered_df.select(f.monotonically_increasing_id().alias('songplay_id'),
                                 f.to_timestamp(f.from_unixtime(f.col('ts')/1000)).alias('start_time'),
                                 f.col('userId').cast(IntegerType()).alias('user_id'),
@@ -167,7 +185,7 @@ def process_log_data(spark, input_bucket, output_bucket, song_data):
                                      'song_id', 'artist_id', 'session_id', 'location', 'user_agent', log_data_part.year, log_data_part.month])
     songplays_table.coalesce(32)
     # write songplays table to parquet files partitioned by year and month
-    print("Writing songplays_fact")
+    print("Writing songplays_fact table")
     songplays_table.coalesce(32).write.partitionBy(['year', 'month']).mode("overwrite").parquet(songplays_output_path)
 
 
