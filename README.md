@@ -10,6 +10,6 @@ Following are my learning goals for this nanodegree:
 3. Spark and DataLakes [DONE]
     1. Learning to use Spark to work with massive datasets
     2. Implement data-lake on AWS S3 using Spark on AWS EMR
-4. Data pipelines [IN PROGRESS]
+4. Data pipelines [DONE]
     1. Learn about data-pipeline and data-quality
     2. Implement production data-pipeline using Apache Airflow and build DW on AWS Redshift
