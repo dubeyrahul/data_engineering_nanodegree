@@ -5,4 +5,3 @@ lessons
 data_warehouse_redshift/dwh.cfg
 data_lake_spark/dl.cfg
 *.DS_Store
-
