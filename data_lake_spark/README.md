@@ -42,8 +42,7 @@ I did not run in EMR notebook because I ran the code on local notebook and was c
 4. Run `/usr/bin/spark-submit etl_emr.py`
 
 Next steps:
-1. I am not sure if this is using all the TASK nodes to run or whether it is running on MASTER node only
-2. Use bootstrap script to setup the environment and submit step on EMR using add-step
+1. Use bootstrap script to setup the environment and submit step on EMR using add-step
 
 <h1>
 </h1>
@@ -101,3 +100,7 @@ Another idea is to use bootstrap actions:
 https://towardsdatascience.com/production-data-processing-with-apache-spark-96a58dfd3fe7
 Put both the bootstrap script and etl script on S3.
 Use aws emr create-cluster and add-actions to run the ETL
+
+Installing packages/jars and using them in Pyspark Jupyter notebook setup:
+https://stackoverflow.com/questions/35762459/add-jar-to-standalone-pyspark/50142102
+See how I have modified the kernel.json's PYSPARK_SUBMIT_ARGS argument
