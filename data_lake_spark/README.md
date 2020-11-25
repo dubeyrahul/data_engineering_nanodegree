@@ -42,7 +42,12 @@ I did not run in EMR notebook because I ran the code on local notebook and was c
 4. Run `/usr/bin/spark-submit etl_emr.py`
 
 Next steps:
+<<<<<<< HEAD
 1. Use bootstrap script to setup the environment and submit step on EMR using add-step
+=======
+1. I am not sure if this is using all the TASK nodes to run or whether it is running on MASTER node only
+2. Use bootstrap script to setup the environment and submit step on EMR using add-step
+>>>>>>> b6c5a96cc07c5471f847bf6d804da77353db5c7a
 
 <h1>
 </h1>
