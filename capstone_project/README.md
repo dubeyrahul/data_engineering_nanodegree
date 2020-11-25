@@ -1,4 +1,4 @@
-In this project, we are given the following data sources:
+This is the capstone project for Data Engineering Nanodegree on Udacity.
 
 ## Goal:
 The goal of this project is to create clean and joinable datasets for data analysis and data science use-cases. The datasets we create will help analysts and scientists analyze immigration patterns in the US. The datasets will be joinable on city that the immigrant is entering into.
