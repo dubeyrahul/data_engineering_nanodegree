@@ -62,9 +62,9 @@ If the database needed to be accessed by 100+ people.
 ## Steps to run:
 To run ETL, run the following from capstone_project directory:
 
-$SPARK_HOME/bin/spark-submit etl_scripts/temperature_etl.py
+```$SPARK_HOME/bin/spark-submit etl_scripts/temperature_etl.py```
 
-$SPARK_HOME/bin/spark-submit etl_scripts/demographics_etl.py
+```$SPARK_HOME/bin/spark-submit etl_scripts/demographics_etl.py```
 
-$SPARK_HOME/bin/spark-submit --packages saurfang:spark-sas7bdat:3.0.0-s_2.11 etl_scripts/immigration_etl.py
+```$SPARK_HOME/bin/spark-submit --packages saurfang:spark-sas7bdat:3.0.0-s_2.11 etl_scripts/immigration_etl.py```
 
